@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>养生小助手</title>
+  <style>
+    :root{
+      --bg1: #f6fffb;
+      --bg2: #e9fff2;
+      --accent: #2d9c6a;
+      --muted: #6b7280;
+      --card: #ffffff;
+      --radius: 14px;
+      font-family: "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+    .wrap{max-width:920px;margin:36px auto;padding:24px;}
+    .card{background:var(--card);border-radius:18px;box-shadow:0 8px 30px rgba(20,30,20,0.06);overflow:hidden}
+
+    header{display:flex;align-items:center;padding:22px 24px;border-bottom:1px solid rgba(16,24,16,0.04)}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#8be7b1,#4fb36a);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;margin-right:16px}
+    header h1{margin:0;font-size:20px;color:#0f5132}
+    header p{margin:4px 0 0 0;color:var(--muted);font-size:13px}
+
+    .main{display:flex;gap:28px;padding:24px}
+    .panel{flex:1;min-height:420px;display:flex;flex-direction:column}
+
+    /* 聊天区 */
+    .chat-area{flex:1;padding:18px;display:flex;flex-direction:column;gap:12px;overflow:auto;background:linear-gradient(180deg, rgba(245,255,250,0.6), rgba(250,255,252,0.6));border-radius:12px}
+    .msg{max-width:78%;padding:12px 14px;border-radius:14px;line-height:1.5}
+    .msg.user{margin-left:auto;background:linear-gradient(90deg,#e6ffef,#d9ffea);color:#064925;border-bottom-right-radius:6px}
+    .msg.bot{margin-right:auto;background:linear-gradient(90deg,#fff,#fbfffb);border:1px solid rgba(40,120,80,0.06);color:#0b3d2a;border-bottom-left-radius:6px}
+    .meta{font-size:12px;color:var(--muted);margin-top:6px}
+
+    /* 输入区 */
+    .composer{display:flex;gap:10px;padding-top:14px}
+    .input{flex:1;display:flex;align-items:center;background:linear-gradient(180deg,#ffffff,#f9fff8);padding:10px;border-radius:12px;border:1px solid rgba(34,139,86,0.06)}
+    .input input{flex:1;border:0;outline:none;font-size:15px;background:transparent;padding:4px}
+    .send-btn{background:var(--accent);border:none;color:white;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer}
+    .send-btn:disabled{opacity:0.6;cursor:not-allowed}
+
+    /* 侧栏 */
+    .sidebar{width:300px;padding:14px;border-left:1px solid rgba(16,24,16,0.04)}
+    .card-title{font-weight:700;color:#0f5132;margin-bottom:8px}
+    .hint{font-size:13px;color:var(--muted);line-height:1.6}
+    .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+    .chip{background:#f1fff4;padding:8px 10px;border-radius:999px;border:1px solid rgba(47,120,71,0.06);font-size:13px;color:#15592b;cursor:pointer}
+
+    /* 小屏自适应 */
+    @media (max-width:880px){
+      .main{flex-direction:column}
+      .sidebar{width:100%;border-left:0;border-top:1px solid rgba(16,24,16,0.04)}
+    }
+
+    /* 小动画 */
+    .typing{display:inline-block;height:8px;width:40px;position:relative}
+    .dot{width:8px;height:8px;border-radius:50%;background:#9adcb5;display:inline-block;margin-right:6px;animation:blink 1s infinite}
+    .dot:nth-child(2){animation-delay:0.15s}
+    .dot:nth-child(3){animation-delay:0.3s}
+    @keyframes blink{0%{opacity:.2;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}100%{opacity:.2;transform:translateY(0)}}
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="logo">养
+        </div>
+        <div>
+          <h1>养生小助手 AI</h1>
+          <p>告诉我你的健康困扰或不良习惯（如：熬夜、久坐、抽烟）— 我会给出可行的养生建议。</p>
+        </div>
+      </header>
+
+      <div class="main">
+        <div class="panel">
+          <div id="chat" class="chat-area" aria-live="polite"></div>
+
+          <div class="composer">
+            <div class="input" role="search">
+              <input id="input" placeholder="输入健康问题或不良习惯，按回车发送..." aria-label="输入您的问题" />
+            </div>
+            <button id="send" class="send-btn">发送</button>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="card-title">快速示例</div>
+          <div class="hint">试试下面的句子，点击即可填入并发送：</div>
+          <div class="chips" id="chips">
+            <div class="chip">每天熬夜到凌晨1点</div>
+            <div class="chip">我抽烟一天一包</div>
+            <div class="chip">久坐工作腰酸背痛</div>
+            <div class="chip">睡眠质量差，容易失眠</div>
+            <div class="chip">总是胃胀，饭后不舒服</div>
+          </div>
+
+          <div style="margin-top:18px">
+            <div class="card-title">说明</div>
+            <div class="hint">页面内置了“前端规则建议”作为离线兜底；若要使用你上传的深度学习模型，请部署后端 API （示例见下文），并保证前端能访问 `http://localhost:5000/api/advice`。</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+<script>
+// DOM
+const chat = document.getElementById('chat');
+const input = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const chips = document.getElementById('chips');
+
+// 辅助：渲染消息
+function addMessage(text, who='bot', meta=null){
+  const el = document.createElement('div');
+  el.className = 'msg ' + (who==='user' ? 'user' : 'bot');
+  el.innerHTML = text.replace(/\n/g,'<br>');
+  chat.appendChild(el);
+  if(meta){
+    const m = document.createElement('div');
+    m.className = 'meta';
+    m.textContent = meta;
+    chat.appendChild(m);
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// 显示 typing
+function addTyping(){
+  const el = document.createElement('div');
+  el.className='msg bot typing-wrapper';
+  el.id = 'typing';
+  el.innerHTML = `<div class='typing'><span class='dot'></span><span class='dot'></span><span class='dot'></span></div>`;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+function removeTyping(){
+  const t = document.getElementById('typing');
+  if(t) t.remove();
+}
+
+// 键盘回车与按钮
+input.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+sendBtn.addEventListener('click', sendMessage);
+
+// chip 点击
+Array.from(document.querySelectorAll('.chip')).forEach(c=>{
+  c.addEventListener('click', ()=>{ input.value = c.textContent; sendMessage(); });
+});
+
+// 发送主流程
+let inFlight = false;
+async function sendMessage(){
+  const text = input.value.trim();
+  if(!text || inFlight) return;
+  inFlight = true;
+  addMessage(text, 'user');
+  input.value = '';
+
+  addTyping();
+
+  // 尝试请求后端 API
+  try{
+    const resp = await fetch('/api/advice', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({message:text})
+    });
+
+    if(!resp.ok) throw new Error('后端返回错误');
+    const data = await resp.json();
+    removeTyping();
+    addMessage(data.reply || '抱歉，未收到有效回答。', 'bot', '来自模型');
+  }catch(err){
+    // 后端不可用 -> 使用前端规则引擎兜底
+    removeTyping();
+    const fallback = generateFallbackAdvice(text);
+    addMessage(fallback, 'bot', '离线建议（本地规则）');
+  }
+
+  inFlight = false;
+}
+
+// 简单的前端规则建议（关键字匹配）
+function generateFallbackAdvice(text){
+  text = text.replace(/\s+/g,'');
+  const pairs = [
+    {k:["熬夜","凌晨"], v:"尽量将就寝时间提前到23:00前，建立睡前放松仪式（手机静音、温水洗脸、深呼吸）。若长期失眠建议就医并考虑认知行为疗法。"},
+    {k:["抽烟","香烟","烟瘾"], v:"建议逐步减少吸烟量并制定戒烟计划；可以寻求医生帮助或使用尼古丁替代疗法，增加体育活动以缓解戒断症状。"},
+    {k:["喝酒","酗酒"], v:"控制饮酒频率和量：男性每日不超过2个标准杯、女性不超过1个；避免空腹饮酒并注意心理疏导。"},
+    {k:["久坐","坐久","久站"], v:"每工作45-60分钟起身活动5-10分钟，做简单伸展或短步行；保持正确坐姿与腰背支撑。"},
+    {k:["失眠","睡不好"], v:"保持固定作息、减少晚间咖啡因摄入、睡前避免强光刺激；如长期严重建议就诊。"},
+    {k:["胃胀","消化不良","饭后不舒服"], v:"进食慢、少食多餐，避免过油腻和辛辣刺激；餐后适度散步帮助消化，必要时就医检查。"},
+  ];
+
+  for(const p of pairs){
+    for(const k of p.k){
+      if(text.indexOf(k) !== -1) return p.v;
+    }
+  }
+
+  // 通用建议
+  return "建议：规律作息、均衡饮食、每周至少150分钟中等强度运动（或75分钟高强度）、保持良好社交与心理状态。如症状严重或持续，请及时就医。";
+}
+
+// For demo: auto greet
+addMessage('你好，我是养生小助手。你可以输入健康问题或不良生活习惯，我会给出建议。', 'bot', '示例');
+
+</script>
+</body>
+</html>
