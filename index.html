@@ -12,25 +12,41 @@
       --muted: #6b7280;
       --card: #ffffff;
       --radius: 14px;
+      --glass: rgba(255,255,255,0.7);
       font-family: "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     }
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-    .wrap{max-width:920px;margin:36px auto;padding:24px;}
-    .card{background:var(--card);border-radius:18px;box-shadow:0 8px 30px rgba(20,30,20,0.06);overflow:hidden}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));-webkit-font-smoothing:antialiased}
+    .wrap{max-width:100%;margin:0 auto;padding:12px}
+    .card{background:var(--card);border-radius:18px;box-shadow:0 10px 40px rgba(20,30,20,0.08);overflow:hidden;position:relative}
 
-    header{display:flex;align-items:center;padding:22px 24px;border-bottom:1px solid rgba(16,24,16,0.04)}
-    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#8be7b1,#4fb36a);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;margin-right:16px}
+    /* 背景装饰：轻盈叶子 SVG 层 */
+    .decor{position:absolute;right:0;top:0;bottom:0;width:320px;pointer-events:none;opacity:0.12;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="640"><g fill="none" stroke="%232d9c6a" stroke-width="1.5"><path d="M20 120c40-40 110-40 140 0s80 60 120 40"/><path d="M40 240c30-60 120-80 170-20s80 120 40 160"/><path d="M10 420c60-80 160-100 220-40s40 140-40 180"/></g></svg>');background-repeat:no-repeat;background-position:right top}
+
+    header{display:flex;align-items:center;padding:18px 24px;border-bottom:1px solid rgba(16,24,16,0.04);background:linear-gradient(90deg,#e9fff2,#f6fffb)}
+    /* 使用内联 SVG 作为头像，避免外部链接失效 */
+    .logo{width:72px;height:72px;border-radius:50%;display:inline-block;flex-shrink:0;margin-right:16px;border:3px solid #c8f7d8;overflow:hidden;background:#fff}
+    .logo svg{width:100%;height:100%;display:block}
+
     header h1{margin:0;font-size:20px;color:#0f5132}
-    header p{margin:4px 0 0 0;color:var(--muted);font-size:13px}
+    header p{margin:6px 0 0 0;color:var(--muted);font-size:13px}
+    .tagline{margin-left:auto;font-size:13px;color:#4e8f6a}
 
-    .main{display:flex;gap:28px;padding:24px}
+    .banner{display:flex;align-items:center;gap:16px;padding:18px;border-bottom:1px solid rgba(16,24,16,0.04);background:linear-gradient(90deg,rgba(237,252,240,0.8),rgba(255,255,255,0.6))}
+    .banner .art{width:120px;height:80px;border-radius:12px;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="%23e9fff2"/><stop offset="1" stop-color="%23ffffff"/></linearGradient></defs><rect width="200" height="120" rx="12" fill="url(%23g)"/><g transform="translate(20,15)" fill="none" stroke="%232d9c6a" stroke-width="2"><path d="M0 60 C20 10,60 10,80 60 C100 110,140 110,160 60"/></g></svg>');background-size:cover}
+    .banner .lead{font-size:16px;color:#0f5132;font-weight:600}
+    .banner .sub{font-size:13px;color:var(--muted)}
+
+    .main{display:flex;gap:20px;padding:18px}
     .panel{flex:1;min-height:420px;display:flex;flex-direction:column}
 
     /* 聊天区 */
-    .chat-area{flex:1;padding:18px;display:flex;flex-direction:column;gap:12px;overflow:auto;background:linear-gradient(180deg, rgba(245,255,250,0.6), rgba(250,255,252,0.6));border-radius:12px}
-    .msg{max-width:78%;padding:12px 14px;border-radius:14px;line-height:1.5}
+    .chat-area{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:auto;background:linear-gradient(180deg, rgba(245,255,250,0.6), rgba(250,255,252,0.6));border-radius:12px}
+    .msg-row{display:flex;align-items:flex-end;gap:10px}
+    .msg{max-width:76%;padding:12px 14px;border-radius:14px;line-height:1.5;box-shadow:0 4px 12px rgba(10,20,10,0.03)}
     .msg.user{margin-left:auto;background:linear-gradient(90deg,#e6ffef,#d9ffea);color:#064925;border-bottom-right-radius:6px}
-    .msg.bot{margin-right:auto;background:linear-gradient(90deg,#fff,#fbfffb);border:1px solid rgba(40,120,80,0.06);color:#0b3d2a;border-bottom-left-radius:6px}
+    .msg.bot{margin-right:auto;background:linear-gradient(90deg,#fff,#fbfffb);border:1px solid rgba(40,120,80,0.06);color:#0b3d2a;border-bottom-left-radius:6px;display:inline-block}
+    .avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;overflow:hidden;border:2px solid rgba(255,255,255,0.8);background:#fff}
+    .avatar svg{width:100%;height:100%;display:block}
     .meta{font-size:12px;color:var(--muted);margin-top:6px}
 
     /* 输入区 */
@@ -41,38 +57,79 @@
     .send-btn:disabled{opacity:0.6;cursor:not-allowed}
 
     /* 侧栏 */
-    .sidebar{width:300px;padding:14px;border-left:1px solid rgba(16,24,16,0.04)}
+    .sidebar{width:320px;padding:14px;border-left:1px solid rgba(16,24,16,0.04);background:linear-gradient(180deg,#f7fff6,#ffffff)}
     .card-title{font-weight:700;color:#0f5132;margin-bottom:8px}
     .hint{font-size:13px;color:var(--muted);line-height:1.6}
     .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
     .chip{background:#f1fff4;padding:8px 10px;border-radius:999px;border:1px solid rgba(47,120,71,0.06);font-size:13px;color:#15592b;cursor:pointer}
 
+    /* 每日一句样式 */
+    .daily{margin-top:18px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#f8fffa);border:1px solid rgba(40,120,80,0.04)}
+    .daily p{margin:0;font-size:14px;color:#15592b}
+    .daily .tag{font-size:12px;color:var(--muted);margin-top:6px}
+
     /* 小屏自适应 */
     @media (max-width:880px){
-      .main{flex-direction:column}
-      .sidebar{width:100%;border-left:0;border-top:1px solid rgba(16,24,16,0.04)}
+      .main{flex-direction:column;padding:12px}
+      .sidebar{width:100%;border-left:0;border-top:1px solid rgba(16,24,16,0.04);padding:10px}
+      .banner{flex-direction:column;align-items:flex-start}
+      .decor{display:none}
+      .avatar{width:36px;height:36px}
+      .logo{width:56px;height:56px}
+      .send-btn{width:100%}
+      .composer{flex-direction:column}
     }
 
-    /* 小动画 */
+    /* typing 动画 */
     .typing{display:inline-block;height:8px;width:40px;position:relative}
     .dot{width:8px;height:8px;border-radius:50%;background:#9adcb5;display:inline-block;margin-right:6px;animation:blink 1s infinite}
     .dot:nth-child(2){animation-delay:0.15s}
     .dot:nth-child(3){animation-delay:0.3s}
     @keyframes blink{0%{opacity:.2;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}100%{opacity:.2;transform:translateY(0)}}
-
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
+
+      <div class="decor" aria-hidden="true"></div>
+
       <header>
-        <div class="logo">养
+        <div class="logo" aria-hidden="true">
+          <!-- 内联 SVG：温柔亲切的女孩头像（简洁风格，保证永不失效） -->
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="小助手头像">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f3fff4"/></linearGradient>
+            </defs>
+            <rect width="120" height="120" rx="60" fill="url(#g1)"/>
+            <!-- 头发 -->
+            <path d="M30 60c0-22 20-28 34-28s34 6 34 28v12c0 14-12 26-34 26s-34-12-34-26z" fill="#f7d9c9"/>
+            <!-- 脸 -->
+            <circle cx="60" cy="60" r="26" fill="#ffeedf"/>
+            <!-- 眼睛 -->
+            <ellipse cx="50" cy="62" rx="3" ry="2" fill="#2d2d2d"/>
+            <ellipse cx="70" cy="62" rx="3" ry="2" fill="#2d2d2d"/>
+            <!-- 微笑 -->
+            <path d="M50 72c4 4 16 4 20 0" stroke="#2d2d2d" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- 衣领 -->
+            <path d="M44 86c8 6 24 6 32 0" stroke="#d8f0de" stroke-width="6" stroke-linecap="round"/>
+          </svg>
         </div>
+
         <div>
           <h1>养生小助手 AI</h1>
           <p>告诉我你的健康困扰或不良习惯（如：熬夜、久坐、抽烟）— 我会给出可行的养生建议。</p>
         </div>
+        <div class="tagline">🌿 身心和谐 · 健康相伴</div>
       </header>
+
+      <div class="banner">
+        <div class="art" aria-hidden="true"></div>
+        <div>
+          <div class="lead">每天一点小改变，健康常伴你左右</div>
+          <div class="sub">科学建议 · 温柔提醒 · 可执行的生活习惯改善方案</div>
+        </div>
+      </div>
 
       <div class="main">
         <div class="panel">
@@ -97,9 +154,16 @@
             <div class="chip">总是胃胀，饭后不舒服</div>
           </div>
 
+          <div class="daily">
+            <div class="card-title">每日养生一句</div>
+            <p id="daily-quote">—— 欢迎！这是你今日的养生小提醒 ——</p>
+            <div class="tag">每天一小句，温柔提醒你注意健康</div>
+            <button id="new-quote" style="margin-top:10px;padding:8px 10px;border-radius:8px;border:none;background:#e9fff2;color:#186b3f;cursor:pointer">换一句</button>
+          </div>
+
           <div style="margin-top:18px">
             <div class="card-title">说明</div>
-            <div class="hint">页面内置了“前端规则建议”作为离线兜底；若要使用你上传的深度学习模型，请部署后端 API （示例见下文），并保证前端能访问 `http://localhost:5000/api/advice`。</div>
+            <div class="hint">页面内置“前端规则建议”作为离线兜底；若要使用你上传的深度学习模型，请部署后端 API（示例见画布中的 server.py），并保证前端能访问 <code>http://localhost:5000/api/advice</code>。</div>
           </div>
         </aside>
       </div>
@@ -113,48 +177,74 @@ const input = document.getElementById('input');
 const sendBtn = document.getElementById('send');
 const chips = document.getElementById('chips');
 
-// 辅助：渲染消息
-function addMessage(text, who='bot', meta=null){
-  const el = document.createElement('div');
-  el.className = 'msg ' + (who==='user' ? 'user' : 'bot');
-  el.innerHTML = text.replace(/\n/g,'<br>');
-  chat.appendChild(el);
+// 每日一句数据
+const QUOTES = [
+  '规律作息比任何神奇补品都更管用：每天尽量在固定时间睡觉与起床。',
+  '久坐一小时，站起来活动5分钟，伸展并喝一小杯水。',
+  '饭后散步10-20分钟，有助于消化与血糖稳定。',
+  '保持每天至少30分钟中等强度运动，能显著提升心情与睡眠质量。',
+  '少吃加工食品与高糖饮料，多吃蔬果与全谷物。',
+  '睡前一小时远离手机与强光，做一本轻松的书或深呼吸。'
+];
+function showRandomQuote(){
+  const q = QUOTES[Math.floor(Math.random()*QUOTES.length)];
+  document.getElementById('daily-quote').textContent = '“' + q + '”';
+}
+showRandomQuote();
+document.getElementById('new-quote').addEventListener('click', showRandomQuote);
+
+// 辅助：渲染消息（包括头像气泡）
+function createAvatarSVG(){
+  return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="120" rx="60" fill="transparent"/><path d="M30 60c0-22 20-28 34-28s34 6 34 28v12c0 14-12 26-34 26s-34-12-34-26z" fill="#f7d9c9"/><circle cx="60" cy="60" r="26" fill="#ffeedf"/><ellipse cx="50" cy="62" rx="3" ry="2" fill="#2d2d2d"/><ellipse cx="70" cy="62" rx="3" ry="2" fill="#2d2d2d"/><path d="M50 72c4 4 16 4 20 0" stroke="#2d2d2d" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+}
+
+function appendMessage(text, who='bot', meta=null){
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + (who==='user'? 'row-user':'row-bot');
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.innerHTML = createAvatarSVG();
+
+  const msg = document.createElement('div');
+  msg.className = 'msg ' + (who==='user'? 'user':'bot');
+  msg.innerHTML = text.replace(/\n/g,'<br>');
+
+  if(who==='user'){
+    // 用户在右侧
+    row.appendChild(msg);
+    row.appendChild(avatar);
+  }else{
+    row.appendChild(avatar);
+    row.appendChild(msg);
+  }
+
+  chat.appendChild(row);
   if(meta){
-    const m = document.createElement('div');
-    m.className = 'meta';
-    m.textContent = meta;
-    chat.appendChild(m);
+    const m = document.createElement('div'); m.className='meta'; m.textContent = meta; chat.appendChild(m);
   }
   chat.scrollTop = chat.scrollHeight;
 }
 
 // 显示 typing
 function addTyping(){
-  const el = document.createElement('div');
-  el.className='msg bot typing-wrapper';
-  el.id = 'typing';
-  el.innerHTML = `<div class='typing'><span class='dot'></span><span class='dot'></span><span class='dot'></span></div>`;
-  chat.appendChild(el);
+  const row = document.createElement('div');
+  row.className='msg-row';
+  row.id = 'typing-row';
+  const avatar = document.createElement('div'); avatar.className='avatar'; avatar.innerHTML = createAvatarSVG();
+  const typing = document.createElement('div'); typing.className='msg bot typing-wrapper'; typing.innerHTML = `<div class='typing'><span class='dot'></span><span class='dot'></span><span class='dot'></span></div>`;
+  row.appendChild(avatar); row.appendChild(typing);
+  chat.appendChild(row);
   chat.scrollTop = chat.scrollHeight;
 }
-function removeTyping(){
-  const t = document.getElementById('typing');
-  if(t) t.remove();
-}
+function removeTyping(){ const t = document.getElementById('typing-row'); if(t) t.remove(); }
 
 // 键盘回车与按钮
-input.addEventListener('keydown', (e)=>{
-  if(e.key === 'Enter'){
-    e.preventDefault();
-    sendMessage();
-  }
-});
+input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); sendMessage(); } });
 sendBtn.addEventListener('click', sendMessage);
 
 // chip 点击
-Array.from(document.querySelectorAll('.chip')).forEach(c=>{
-  c.addEventListener('click', ()=>{ input.value = c.textContent; sendMessage(); });
-});
+Array.from(document.querySelectorAll('.chip')).forEach(c=>{ c.addEventListener('click', ()=>{ input.value = c.textContent; sendMessage(); }); });
 
 // 发送主流程
 let inFlight = false;
@@ -162,7 +252,7 @@ async function sendMessage(){
   const text = input.value.trim();
   if(!text || inFlight) return;
   inFlight = true;
-  addMessage(text, 'user');
+  appendMessage(text, 'user');
   input.value = '';
 
   addTyping();
@@ -170,20 +260,18 @@ async function sendMessage(){
   // 尝试请求后端 API
   try{
     const resp = await fetch('/api/advice', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({message:text})
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({message:text})
     });
 
     if(!resp.ok) throw new Error('后端返回错误');
     const data = await resp.json();
     removeTyping();
-    addMessage(data.reply || '抱歉，未收到有效回答。', 'bot', '来自模型');
+    appendMessage(data.reply || '抱歉，未收到有效回答。', 'bot', '来自模型');
   }catch(err){
     // 后端不可用 -> 使用前端规则引擎兜底
     removeTyping();
     const fallback = generateFallbackAdvice(text);
-    addMessage(fallback, 'bot', '离线建议（本地规则）');
+    appendMessage(fallback, 'bot', '离线建议（本地规则）');
   }
 
   inFlight = false;
@@ -202,9 +290,7 @@ function generateFallbackAdvice(text){
   ];
 
   for(const p of pairs){
-    for(const k of p.k){
-      if(text.indexOf(k) !== -1) return p.v;
-    }
+    for(const k of p.k){ if(text.indexOf(k) !== -1) return p.v; }
   }
 
   // 通用建议
@@ -212,7 +298,7 @@ function generateFallbackAdvice(text){
 }
 
 // For demo: auto greet
-addMessage('你好，我是养生小助手。你可以输入健康问题或不良生活习惯，我会给出建议。', 'bot', '示例');
+appendMessage('你好，我是养生小助手。你可以输入健康问题或不良生活习惯，我会给出建议。', 'bot', '示例');
 
 </script>
 </body>
