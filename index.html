@@ -3,103 +3,947 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>养生小助手</title>
+  <title>养生小助手AI - 您的专属健康顾问</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root{
+    :root {
+      --primary: #2d9c6a;
+      --primary-light: #42c181;
+      --primary-dark: #1a7a4f;
+      --secondary: #6d4cff;
       --bg1: #f6fffb;
       --bg2: #e9fff2;
-      --accent: #2d9c6a;
-      --muted: #6b7280;
+      --bg-gradient: linear-gradient(135deg, #f6fffb 0%, #e9fff2 50%, #e3f9ff 100%);
+      --glass: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --text-dark: #0f5132;
+      --text-light: #5d7a6b;
+      --text-muted: #6b7280;
       --card: #ffffff;
-      --radius: 14px;
-      --glass: rgba(255,255,255,0.7);
-      font-family: "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --shadow: 0 12px 40px rgba(20, 30, 20, 0.08);
+      --shadow-light: 0 6px 20px rgba(45, 156, 106, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --transition: all 0.3s ease;
+      font-family: "Helvetica Neue", "Segoe UI", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     }
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));-webkit-font-smoothing:antialiased}
-    .wrap{max-width:100%;margin:0 auto;padding:12px}
-    .card{background:var(--card);border-radius:18px;box-shadow:0 10px 40px rgba(20,30,20,0.08);overflow:hidden;position:relative}
-
-    /* 背景装饰：轻盈叶子 SVG 层 */
-    .decor{position:absolute;right:0;top:0;bottom:0;width:320px;pointer-events:none;opacity:0.12;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="640"><g fill="none" stroke="%232d9c6a" stroke-width="1.5"><path d="M20 120c40-40 110-40 140 0s80 60 120 40"/><path d="M40 240c30-60 120-80 170-20s80 120 40 160"/><path d="M10 420c60-80 160-100 220-40s40 140-40 180"/></g></svg>');background-repeat:no-repeat;background-position:right top}
-
-    header{display:flex;align-items:center;padding:18px 24px;border-bottom:1px solid rgba(16,24,16,0.04);background:linear-gradient(90deg,#e9fff2,#f6fffb)}
-    /* 使用内联 SVG 作为头像，避免外部链接失效 */
-    .logo{width:72px;height:72px;border-radius:50%;display:inline-block;flex-shrink:0;margin-right:16px;border:3px solid #c8f7d8;overflow:hidden;background:#fff}
-    .logo svg{width:100%;height:100%;display:block}
-
-    header h1{margin:0;font-size:20px;color:#0f5132}
-    header p{margin:6px 0 0 0;color:var(--muted);font-size:13px}
-    .tagline{margin-left:auto;font-size:13px;color:#4e8f6a}
-
-    .banner{display:flex;align-items:center;gap:16px;padding:18px;border-bottom:1px solid rgba(16,24,16,0.04);background:linear-gradient(90deg,rgba(237,252,240,0.8),rgba(255,255,255,0.6))}
-    .banner .art{width:120px;height:80px;border-radius:12px;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="%23e9fff2"/><stop offset="1" stop-color="%23ffffff"/></linearGradient></defs><rect width="200" height="120" rx="12" fill="url(%23g)"/><g transform="translate(20,15)" fill="none" stroke="%232d9c6a" stroke-width="2"><path d="M0 60 C20 10,60 10,80 60 C100 110,140 110,160 60"/></g></svg>');background-size:cover}
-    .banner .lead{font-size:16px;color:#0f5132;font-weight:600}
-    .banner .sub{font-size:13px;color:var(--muted)}
-
-    .main{display:flex;gap:20px;padding:18px}
-    .panel{flex:1;min-height:420px;display:flex;flex-direction:column}
-
-    /* 聊天区 */
-    .chat-area{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:auto;background:linear-gradient(180deg, rgba(245,255,250,0.6), rgba(250,255,252,0.6));border-radius:12px}
-    .msg-row{display:flex;align-items:flex-end;gap:10px}
-    .msg{max-width:76%;padding:12px 14px;border-radius:14px;line-height:1.5;box-shadow:0 4px 12px rgba(10,20,10,0.03)}
-    .msg.user{margin-left:auto;background:linear-gradient(90deg,#e6ffef,#d9ffea);color:#064925;border-bottom-right-radius:6px}
-    .msg.bot{margin-right:auto;background:linear-gradient(90deg,#fff,#fbfffb);border:1px solid rgba(40,120,80,0.06);color:#0b3d2a;border-bottom-left-radius:6px;display:inline-block}
-    .avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;overflow:hidden;border:2px solid rgba(255,255,255,0.8);background:#fff}
-    .avatar svg{width:100%;height:100%;display:block}
-    .meta{font-size:12px;color:var(--muted);margin-top:6px}
-
-    /* 输入区 */
-    .composer{display:flex;gap:10px;padding-top:14px}
-    .input{flex:1;display:flex;align-items:center;background:linear-gradient(180deg,#ffffff,#f9fff8);padding:10px;border-radius:12px;border:1px solid rgba(34,139,86,0.06)}
-    .input input{flex:1;border:0;outline:none;font-size:15px;background:transparent;padding:4px}
-    .send-btn{background:var(--accent);border:none;color:white;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer}
-    .send-btn:disabled{opacity:0.6;cursor:not-allowed}
-
-    /* 侧栏 */
-    .sidebar{width:320px;padding:14px;border-left:1px solid rgba(16,24,16,0.04);background:linear-gradient(180deg,#f7fff6,#ffffff)}
-    .card-title{font-weight:700;color:#0f5132;margin-bottom:8px}
-    .hint{font-size:13px;color:var(--muted);line-height:1.6}
-    .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
-    .chip{background:#f1fff4;padding:8px 10px;border-radius:999px;border:1px solid rgba(47,120,71,0.06);font-size:13px;color:#15592b;cursor:pointer}
-
-    /* 每日一句样式 */
-    .daily{margin-top:18px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#f8fffa);border:1px solid rgba(40,120,80,0.04)}
-    .daily p{margin:0;font-size:14px;color:#15592b}
-    .daily .tag{font-size:12px;color:var(--muted);margin-top:6px}
-
-    /* 小屏自适应 */
-    @media (max-width:880px){
-      .main{flex-direction:column;padding:12px}
-      .sidebar{width:100%;border-left:0;border-top:1px solid rgba(16,24,16,0.04);padding:10px}
-      .banner{flex-direction:column;align-items:flex-start}
-      .decor{display:none}
-      .avatar{width:36px;height:36px}
-      .logo{width:56px;height:56px}
-      .send-btn{width:100%}
-      .composer{flex-direction:column}
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg-gradient);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-
-    /* typing 动画 */
-    .typing{display:inline-block;height:8px;width:40px;position:relative}
-    .dot{width:8px;height:8px;border-radius:50%;background:#9adcb5;display:inline-block;margin-right:6px;animation:blink 1s infinite}
-    .dot:nth-child(2){animation-delay:0.15s}
-    .dot:nth-child(3){animation-delay:0.3s}
-    @keyframes blink{0%{opacity:.2;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}100%{opacity:.2;transform:translateY(0)}}
+    
+    /* 背景动画元素 */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    
+    .floating-element {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.05;
+      animation: float 20s infinite linear;
+    }
+    
+    .floating-element:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      background: var(--primary);
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .floating-element:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      background: var(--secondary);
+      top: 60%;
+      right: 5%;
+      animation-delay: -5s;
+      animation-duration: 25s;
+    }
+    
+    .floating-element:nth-child(3) {
+      width: 60px;
+      height: 60px;
+      background: var(--primary-light);
+      bottom: 20%;
+      left: 20%;
+      animation-delay: -10s;
+      animation-duration: 30s;
+    }
+    
+    .floating-element:nth-child(4) {
+      width: 90px;
+      height: 90px;
+      background: var(--primary-dark);
+      top: 20%;
+      right: 15%;
+      animation-delay: -15s;
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      25% {
+        transform: translateY(-20px) rotate(90deg);
+      }
+      50% {
+        transform: translateY(0) rotate(180deg);
+      }
+      75% {
+        transform: translateY(20px) rotate(270deg);
+      }
+    }
+    
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--glass-border);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* 顶部装饰线条 */
+    .top-line {
+      height: 4px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .top-line::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+      animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+      100% {
+        left: 100%;
+      }
+    }
+    
+    /* 头部区域 */
+    header {
+      display: flex;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(16, 24, 16, 0.05);
+      background: linear-gradient(90deg, rgba(233, 255, 242, 0.9), rgba(255, 255, 255, 0.7));
+      position: relative;
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+      margin-right: 20px;
+      border: 4px solid #ffffff;
+      overflow: hidden;
+      background: linear-gradient(135deg, #c8f7d8, #ffffff);
+      box-shadow: 0 6px 15px rgba(45, 156, 106, 0.15);
+      transition: var(--transition);
+    }
+    
+    .logo:hover {
+      transform: rotate(10deg) scale(1.05);
+      box-shadow: 0 10px 25px rgba(45, 156, 106, 0.25);
+    }
+    
+    .logo svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: var(--text-dark);
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    header p {
+      margin: 8px 0 0 0;
+      color: var(--text-light);
+      font-size: 14px;
+      max-width: 500px;
+    }
+    
+    .tagline {
+      margin-left: auto;
+      font-size: 14px;
+      color: var(--primary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(45, 156, 106, 0.08);
+      border-radius: 50px;
+      transition: var(--transition);
+    }
+    
+    .tagline:hover {
+      background: rgba(45, 156, 106, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    /* 健康数据 Banner */
+    .health-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(237, 252, 240, 0.9), rgba(232, 245, 255, 0.8));
+      border-bottom: 1px solid rgba(16, 24, 16, 0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .banner-bg {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 180px;
+      pointer-events: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"><defs><linearGradient id="bannerGrad" x1="0" x2="1"><stop offset="0" stop-color="%232d9c6a"/><stop offset="1" stop-color="%236d4cff"/></linearGradient></defs><g fill="none" stroke="url(%23bannerGrad)" stroke-width="1.5" opacity="0.1"><path d="M20 30c40-40 110-40 140 0s80 60 120 40"/><path d="M10 70c60-80 160-100 220-40s40 140-40 180"/><path d="M40 100c30 Sixty 120-80 170-20s80 120 40 160"/></g></svg>');
+      background-repeat: no-repeat;
+      background-position: right center;
+    }
+    
+    .banner-content {
+      flex: 1;
+      z-index: 1;
+    }
+    
+    .banner-lead {
+      font-size: 18px;
+      color: var(--text-dark);
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .banner-lead i {
+      color: var(--primary);
+    }
+    
+    .banner-sub {
+      font-size: 14px;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
+    
+    .health-stats {
+      display: flex;
+      gap: 24px;
+      z-index: 1;
+    }
+    
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 18px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-light);
+      transition: var(--transition);
+      min-width: 100px;
+    }
+    
+    .stat-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(45, 156, 106, 0.15);
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 6px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main {
+      display: flex;
+      gap: 24px;
+      padding: 24px;
+      flex: 1;
+      min-height: 0;
+    }
+    
+    .panel {
+      flex: 1;
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* 聊天区域 */
+    .chat-area {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: auto;
+      background: rgba(245, 255, 250, 0.5);
+      border-radius: var(--radius-sm);
+      margin-bottom: 16px;
+      scroll-behavior: smooth;
+    }
+    
+    .chat-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .chat-area::-webkit-scrollbar-track {
+      background: rgba(45, 156, 106, 0.05);
+      border-radius: 10px;
+    }
+    
+    .chat-area::-webkit-scrollbar-thumb {
+      background: rgba(45, 156, 106, 0.2);
+      border-radius: 10px;
+    }
+    
+    .msg-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      animation: fadeInUp 0.4s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .msg {
+      max-width: 76%;
+      padding: 16px 18px;
+      border-radius: 18px;
+      line-height: 1.6;
+      box-shadow: var(--shadow-light);
+      position: relative;
+      word-break: break-word;
+      animation: messageAppear 0.3s ease-out;
+    }
+    
+    @keyframes messageAppear {
+      0% {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    .msg.user {
+      margin-left: auto;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      color: white;
+      border-bottom-right-radius: 6px;
+    }
+    
+    .msg.bot {
+      margin-right: auto;
+      background: linear-gradient(135deg, #ffffff, #fbfffb);
+      border: 1px solid rgba(40, 120, 80, 0.08);
+      color: var(--text-dark);
+      border-bottom-left-radius: 6px;
+    }
+    
+    .msg.bot::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -8px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 0 12px 12px;
+      border-color: transparent transparent #fbfffb transparent;
+      filter: drop-shadow(-1px 2px 1px rgba(0,0,0,0.02));
+    }
+    
+    .msg.user::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: -8px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 0 12px 12px;
+      border-color: transparent transparent var(--primary) transparent;
+      transform: rotate(90deg);
+    }
+    
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+    
+    .avatar.user {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    }
+    
+    .avatar i {
+      font-size: 18px;
+      color: white;
+    }
+    
+    .avatar svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-align: center;
+    }
+    
+    /* 输入区域 */
+    .composer {
+      display: flex;
+      gap: 12px;
+      padding-top: 4px;
+    }
+    
+    .input-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(180deg, #ffffff, #f9fff8);
+      padding: 8px 16px;
+      border-radius: 50px;
+      border: 1px solid rgba(34, 139, 86, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      transition: var(--transition);
+    }
+    
+    .input-container:focus-within {
+      border-color: var(--primary-light);
+      box-shadow: 0 6px 18px rgba(45, 156, 106, 0.12);
+      transform: translateY(-2px);
+    }
+    
+    .input-container input {
+      flex: 1;
+      border: 0;
+      outline: none;
+      font-size: 15px;
+      background: transparent;
+      padding: 8px 4px;
+      color: var(--text-dark);
+    }
+    
+    .input-container input::placeholder {
+      color: var(--text-light);
+    }
+    
+    .input-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .input-icon {
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+    
+    .input-icon:hover {
+      color: var(--primary);
+      background: rgba(45, 156, 106, 0.08);
+    }
+    
+    .send-btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 15px rgba(45, 156, 106, 0.3);
+      transition: var(--transition);
+    }
+    
+    .send-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(45, 156, 106, 0.4);
+    }
+    
+    .send-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .sidebar-card {
+      padding: 20px;
+      border-radius: var(--radius);
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-light);
+      transition: var(--transition);
+    }
+    
+    .sidebar-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(45, 156, 106, 0.12);
+    }
+    
+    .card-title {
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .card-title i {
+      color: var(--primary);
+    }
+    
+    .hint {
+      font-size: 14px;
+      color: var(--text-light);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    
+    .chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .chip {
+      background: linear-gradient(135deg, #f1fff4, #e6ffef);
+      padding: 10px 16px;
+      border-radius: 50px;
+      border: 1px solid rgba(47, 120, 71, 0.1);
+      font-size: 14px;
+      color: var(--primary-dark);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .chip:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(45, 156, 106, 0.15);
+      background: linear-gradient(135deg, #e6ffef, #d9ffea);
+    }
+    
+    .chip i {
+      font-size: 12px;
+    }
+    
+    .daily-quote {
+      font-size: 15px;
+      color: var(--text-dark);
+      line-height: 1.6;
+      margin: 12px 0;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: var(--radius-sm);
+      border-left: 4px solid var(--primary);
+    }
+    
+    .quote-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+    
+    .new-quote-btn {
+      padding: 10px 18px;
+      border-radius: 50px;
+      border: none;
+      background: linear-gradient(135deg, #e9fff2, #d9ffea);
+      color: var(--primary-dark);
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+    
+    .new-quote-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(45, 156, 106, 0.15);
+    }
+    
+    .quote-tag {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .health-tips {
+      margin-top: 8px;
+    }
+    
+    .tip-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.6);
+      transition: var(--transition);
+    }
+    
+    .tip-item:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateX(5px);
+    }
+    
+    .tip-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(45, 156, 106, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    
+    .tip-text {
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+    
+    /* 打字动画 */
+    .typing {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+    }
+    
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: inline-block;
+      margin-right: 6px;
+      animation: blink 1.2s infinite;
+    }
+    
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes blink {
+      0%, 60%, 100% {
+        opacity: 0.3;
+        transform: translateY(0);
+      }
+      30% {
+        opacity: 1;
+        transform: translateY(-5px);
+      }
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 992px) {
+      .main {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      
+      .sidebar-card {
+        flex: 1;
+        min-width: 300px;
+      }
+      
+      .health-stats {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .stat-item {
+        min-width: 80px;
+        padding: 10px 12px;
+      }
+      
+      .stat-value {
+        font-size: 20px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      
+      .tagline {
+        margin-left: 0;
+        align-self: flex-start;
+      }
+      
+      .health-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      
+      .health-stats {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .msg {
+        max-width: 85%;
+      }
+      
+      .sidebar-card {
+        min-width: 100%;
+      }
+      
+      .logo {
+        width: 64px;
+        height: 64px;
+      }
+      
+      header h1 {
+        font-size: 20px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .wrap {
+        padding: 10px;
+      }
+      
+      .main, header, .health-banner {
+        padding: 16px;
+      }
+      
+      .health-stats {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .stat-item {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        min-width: auto;
+      }
+      
+      .send-btn span {
+        display: none;
+      }
+      
+      .send-btn {
+        padding: 12px;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        justify-content: center;
+      }
+      
+      .composer {
+        gap: 8px;
+      }
+    }
+    
+    /* 对话欢迎动画 */
+    .welcome-animation {
+      text-align: center;
+      padding: 20px;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.8;
+      }
+    }
+    
+    /* 滚动到顶部按钮 */
+    .scroll-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(45, 156, 106, 0.3);
+      transition: var(--transition);
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    .scroll-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .scroll-top:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 10px 30px rgba(45, 156, 106, 0.4);
+    }
   </style>
 </head>
 <body>
+  <!-- 背景动画元素 -->
+  <div class="bg-animation">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+  
+  <!-- 滚动到顶部按钮 -->
+  <div class="scroll-top" id="scrollTop">
+    <i class="fas fa-chevron-up"></i>
+  </div>
+  
   <div class="wrap">
     <div class="card">
-
-      <div class="decor" aria-hidden="true"></div>
-
+      <!-- 顶部装饰线 -->
+      <div class="top-line"></div>
+      
+      <!-- 头部区域 -->
       <header>
         <div class="logo" aria-hidden="true">
-          <!-- 内联 SVG：温柔亲切的女孩头像（简洁风格，保证永不失效） -->
-          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="小助手头像">
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="养生小助手头像">
             <defs>
-              <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f3fff4"/></linearGradient>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0" stop-color="#fff"/>
+                <stop offset="1" stop-color="#f3fff4"/>
+              </linearGradient>
+              <linearGradient id="g2" x1="0" x2="1">
+                <stop offset="0" stop-color="#42c181"/>
+                <stop offset="1" stop-color="#2d9c6a"/>
+              </linearGradient>
             </defs>
             <rect width="120" height="120" rx="60" fill="url(#g1)"/>
             <!-- 头发 -->
@@ -112,70 +956,174 @@
             <!-- 微笑 -->
             <path d="M50 72c4 4 16 4 20 0" stroke="#2d2d2d" stroke-width="2" fill="none" stroke-linecap="round"/>
             <!-- 衣领 -->
-            <path d="M44 86c8 6 24 6 32 0" stroke="#d8f0de" stroke-width="6" stroke-linecap="round"/>
+            <path d="M44 86c8 6 24 6 32 0" stroke="url(#g2)" stroke-width="6" stroke-linecap="round"/>
+            <!-- 头上的叶子装饰 -->
+            <path d="M50 30c0-8 8-8 10-4s4 10-2 12" fill="#42c181" opacity="0.8"/>
+            <path d="M70 30c0-8-8-8-10-4s-4 10 2 12" fill="#42c181" opacity="0.8"/>
           </svg>
         </div>
 
         <div>
           <h1>养生小助手 AI</h1>
-          <p>告诉我你的健康困扰或不良习惯（如：熬夜、久坐、抽烟）— 我会给出可行的养生建议。</p>
+          <p>告诉我你的健康困扰或不良习惯（如：熬夜、久坐、抽烟）— 我会给出科学、可行的养生建议。</p>
         </div>
-        <div class="tagline">🌿 身心和谐 · 健康相伴</div>
+        <div class="tagline">
+          <i class="fas fa-leaf"></i>
+          <span>身心和谐 · 健康相伴</span>
+        </div>
       </header>
-
-      <div class="banner">
-        <div class="art" aria-hidden="true"></div>
-        <div>
-          <div class="lead">每天一点小改变，健康常伴你左右</div>
-          <div class="sub">科学建议 · 温柔提醒 · 可执行的生活习惯改善方案</div>
+      
+      <!-- 健康数据 Banner -->
+      <div class="health-banner">
+        <div class="banner-bg"></div>
+        <div class="banner-content">
+          <div class="banner-lead">
+            <i class="fas fa-heartbeat"></i>
+            <span>每天一点小改变，健康常伴你左右</span>
+          </div>
+          <div class="banner-sub">科学建议 · 温柔提醒 · 可执行的生活习惯改善方案 · 个性化健康指导</div>
+        </div>
+        
+        <div class="health-stats">
+          <div class="stat-item">
+            <div class="stat-value" id="adviceCount">127</div>
+            <div class="stat-label">已提供建议</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="userCount">84</div>
+            <div class="stat-label">今日活跃用户</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">4.9</div>
+            <div class="stat-label">用户满意度</div>
+          </div>
         </div>
       </div>
-
+      
+      <!-- 主内容区 -->
       <div class="main">
+        <!-- 聊天主面板 -->
         <div class="panel">
           <div id="chat" class="chat-area" aria-live="polite"></div>
-
+          
+          <!-- 输入区域 -->
           <div class="composer">
-            <div class="input" role="search">
-              <input id="input" placeholder="输入健康问题或不良习惯，按回车发送..." aria-label="输入您的问题" />
+            <div class="input-container">
+              <input id="input" type="text" placeholder="输入健康问题或不良习惯，例如：我经常熬夜到凌晨..." aria-label="输入您的问题" />
+              <div class="input-actions">
+                <div class="input-icon" id="voiceBtn" title="语音输入">
+                  <i class="fas fa-microphone"></i>
+                </div>
+                <div class="input-icon" id="attachBtn" title="附加文件">
+                  <i class="fas fa-paperclip"></i>
+                </div>
+              </div>
             </div>
-            <button id="send" class="send-btn">发送</button>
+            <button id="send" class="send-btn">
+              <i class="fas fa-paper-plane"></i>
+              <span>发送</span>
+            </button>
           </div>
         </div>
-
+        
+        <!-- 侧边栏 -->
         <aside class="sidebar">
-          <div class="card-title">快速示例</div>
-          <div class="hint">试试下面的句子，点击即可填入并发送：</div>
-          <div class="chips" id="chips">
-            <div class="chip">每天熬夜到凌晨1点</div>
-            <div class="chip">我抽烟一天一包</div>
-            <div class="chip">久坐工作腰酸背痛</div>
-            <div class="chip">睡眠质量差，容易失眠</div>
-            <div class="chip">总是胃胀，饭后不舒服</div>
+          <!-- 快速示例 -->
+          <div class="sidebar-card">
+            <div class="card-title">
+              <i class="fas fa-bolt"></i>
+              <span>快速示例</span>
+            </div>
+            <div class="hint">试试下面的句子，点击即可填入并发送：</div>
+            <div class="chips" id="chips">
+              <div class="chip">
+                <i class="fas fa-moon"></i>
+                <span>每天熬夜到凌晨1点</span>
+              </div>
+              <div class="chip">
+                <i class="fas fa-smoking"></i>
+                <span>我抽烟一天一包</span>
+              </div>
+              <div class="chip">
+                <i class="fas fa-chair"></i>
+                <span>久坐工作腰酸背痛</span>
+              </div>
+              <div class="chip">
+                <i class="fas fa-bed"></i>
+                <span>睡眠质量差，容易失眠</span>
+              </div>
+              <div class="chip">
+                <i class="fas fa-stomach"></i>
+                <span>总是胃胀，饭后不舒服</span>
+              </div>
+              <div class="chip">
+                <i class="fas fa-apple-alt"></i>
+                <span>饮食不规律，经常吃外卖</span>
+              </div>
+            </div>
           </div>
-
-          <div class="daily">
-            <div class="card-title">每日养生一句</div>
-            <p id="daily-quote">—— 欢迎！这是你今日的养生小提醒 ——</p>
-            <div class="tag">每天一小句，温柔提醒你注意健康</div>
-            <button id="new-quote" style="margin-top:10px;padding:8px 10px;border-radius:8px;border:none;background:#e9fff2;color:#186b3f;cursor:pointer">换一句</button>
+          
+          <!-- 每日养生一句 -->
+          <div class="sidebar-card">
+            <div class="card-title">
+              <i class="fas fa-quote-left"></i>
+              <span>每日养生一句</span>
+            </div>
+            <div class="daily-quote" id="daily-quote">
+              规律作息比任何神奇补品都更管用：每天尽量在固定时间睡觉与起床。
+            </div>
+            <div class="quote-actions">
+              <button id="new-quote" class="new-quote-btn">
+                <i class="fas fa-redo"></i>
+                <span>换一句</span>
+              </button>
+              <div class="quote-tag">
+                <i class="far fa-clock"></i>
+                <span>每天更新</span>
+              </div>
+            </div>
           </div>
+          
+          <!-- 健康小贴士 -->
+          <div class="sidebar-card">
+            <div class="card-title">
+              <i class="fas fa-lightbulb"></i>
+              <span>健康小贴士</span>
+            </div>
+            <div class="health-tips">
+              <div class="tip-item">
+                <div class="tip-icon">
+                  <i class="fas fa-glass-water"></i>
+                </div>
+                <div class="tip-text">每天喝足8杯水，保持身体水分平衡</div>
+              </div>
+              <div class="tip-item">
+                <div class="tip-icon">
+                  <i class="fas fa-walking"></i>
+                </div>
+                <div class="tip-text">每坐1小时，起身活动5分钟</div>
+              </div>
+              <div class="tip-item">
+<div class="tip-icon">
+<i class="fas fa-utensils"></i>
+</div>
+<div class="tip-text">细嚼慢咽，每餐至少吃20分钟</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
 
-          <div style="margin-top:18px">
-            <div class="card-title">说明</div>
-            <div class="hint">页面内置“前端规则建议”作为离线兜底；若要使用你上传的深度学习模型，请部署后端 API（示例见画布中的 server.py），并保证前端能访问 <code>http://localhost:5000/api/advice</code>。</div>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </div>
-
-<script>
-// DOM
+</div> <script>
+// DOM 元素
 const chat = document.getElementById('chat');
 const input = document.getElementById('input');
 const sendBtn = document.getElementById('send');
 const chips = document.getElementById('chips');
+const scrollTopBtn = document.getElementById('scrollTop');
+const adviceCount = document.getElementById('adviceCount');
+const userCount = document.getElementById('userCount');
 
 // 每日一句数据
 const QUOTES = [
@@ -184,123 +1132,374 @@ const QUOTES = [
   '饭后散步10-20分钟，有助于消化与血糖稳定。',
   '保持每天至少30分钟中等强度运动，能显著提升心情与睡眠质量。',
   '少吃加工食品与高糖饮料，多吃蔬果与全谷物。',
-  '睡前一小时远离手机与强光，做一本轻松的书或深呼吸。'
+  '睡前一小时远离手机与强光，做一本轻松的书或深呼吸。',
+  '每天晒15分钟太阳，有助于维生素D合成和情绪调节。',
+  '压力大时尝试深呼吸：吸气4秒，屏气7秒，呼气8秒。',
+  '饮食多样化，每周至少吃25种不同的食物。',
+  '保持社交活动，良好的人际关系有益身心健康。'
 ];
-function showRandomQuote(){
-  const q = QUOTES[Math.floor(Math.random()*QUOTES.length)];
-  document.getElementById('daily-quote').textContent = '“' + q + '”';
+
+// 健康建议数据
+const HEALTH_TIPS = [
+  '每天喝足8杯水，保持身体水分平衡',
+  '每坐1小时，起身活动5分钟',
+  '细嚼慢咽，每餐至少吃20分钟',
+  '保持充足睡眠，成年人每晚7-9小时',
+  '多吃深色蔬菜，补充维生素和矿物质',
+  '减少盐分摄入，每日不超过5克',
+  '定期体检，及早发现健康问题',
+  '保持积极心态，培养感恩习惯'
+];
+
+// 统计计数器
+let adviceCounter = 127;
+let userCounter = 84;
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+  // 设置滚动监听
+  window.addEventListener('scroll', toggleScrollTopButton);
+  
+  // 更新统计数字动画
+  updateStats();
+  
+  // 添加欢迎消息
+  setTimeout(() => {
+    appendMessage(
+      '您好！我是养生小助手AI，随时为您提供专业的健康建议。您可以说说最近的身体状况、生活习惯或健康困扰。',
+      'bot',
+      '欢迎'
+    );
+  }, 500);
+  
+  // 添加示例提示
+  setTimeout(() => {
+    appendMessage(
+      '您可以点击侧边栏的示例问题快速提问，或者直接输入您关心的问题。',
+      'bot',
+      '提示'
+    );
+  }, 1500);
+});
+
+// 更新统计数字动画
+function updateStats() {
+  // 模拟数字增长动画
+  let adviceTarget = adviceCounter + Math.floor(Math.random() * 10);
+  let userTarget = userCounter + Math.floor(Math.random() * 5);
+  
+  animateCounter(adviceCount, adviceCounter, adviceTarget, 1500);
+  animateCounter(userCount, userCounter, userTarget, 1500);
+  
+  adviceCounter = adviceTarget;
+  userCounter = userTarget;
+  
+  // 每30秒更新一次
+  setTimeout(updateStats, 30000);
 }
+
+// 数字动画函数
+function animateCounter(element, start, end, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const value = Math.floor(progress * (end - start) + start);
+    element.textContent = value;
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
+// 显示/隐藏滚动到顶部按钮
+function toggleScrollTopButton() {
+  if (window.pageYOffset > 300) {
+    scrollTopBtn.classList.add('visible');
+  } else {
+    scrollTopBtn.classList.remove('visible');
+  }
+}
+
+// 滚动到顶部
+scrollTopBtn.addEventListener('click', function() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+});
+
+// 每日一句功能
+function showRandomQuote() {
+  const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  document.getElementById('daily-quote').textContent = `"${quote}"`;
+}
+
+// 初始化每日一句
 showRandomQuote();
 document.getElementById('new-quote').addEventListener('click', showRandomQuote);
 
-// 辅助：渲染消息（包括头像气泡）
-function createAvatarSVG(){
-  return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="120" rx="60" fill="transparent"/><path d="M30 60c0-22 20-28 34-28s34 6 34 28v12c0 14-12 26-34 26s-34-12-34-26z" fill="#f7d9c9"/><circle cx="60" cy="60" r="26" fill="#ffeedf"/><ellipse cx="50" cy="62" rx="3" ry="2" fill="#2d2d2d"/><ellipse cx="70" cy="62" rx="3" ry="2" fill="#2d2d2d"/><path d="M50 72c4 4 16 4 20 0" stroke="#2d2d2d" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+// 创建头像SVG
+function createAvatarSVG(isUser = false) {
+  if (isUser) {
+    // 用户头像（简单圆形）
+    return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="60" fill="url(#userGrad)"/>
+      <defs>
+        <linearGradient id="userGrad" x1="0" x2="1">
+          <stop offset="0" stop-color="#42c181"/>
+          <stop offset="1" stop-color="#2d9c6a"/>
+        </linearGradient>
+      </defs>
+      <text x="60" y="70" text-anchor="middle" fill="white" font-size="40" font-weight="bold">你</text>
+    </svg>`;
+  }
+  
+  // AI助手头像
+  return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="120" rx="60" fill="url(#g1)"/>
+    <defs>
+      <linearGradient id="g1" x1="0" x2="1">
+        <stop offset="0" stop-color="#fff"/>
+        <stop offset="1" stop-color="#f3fff4"/>
+      </linearGradient>
+    </defs>
+    <!-- 头发 -->
+    <path d="M30 60c0-22 20-28 34-28s34 6 34 28v12c0 14-12 26-34 26s-34-12-34-26z" fill="#f7d9c9"/>
+    <!-- 脸 -->
+    <circle cx="60" cy="60" r="26" fill="#ffeedf"/>
+    <!-- 眼睛 -->
+    <ellipse cx="50" cy="62" rx="3" ry="2" fill="#2d2d2d"/>
+    <ellipse cx="70" cy="62" rx="3" ry="2" fill="#2d2d2d"/>
+    <!-- 微笑 -->
+    <path d="M50 72c4 4 16 4 20 0" stroke="#2d2d2d" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- 衣领 -->
+    <path d="M44 86c8 6 24 6 32 0" stroke="#d8f0de" stroke-width="6" stroke-linecap="round"/>
+  </svg>`;
 }
 
-function appendMessage(text, who='bot', meta=null){
+// 添加消息到聊天区
+function appendMessage(text, who = 'bot', meta = null) {
   const row = document.createElement('div');
-  row.className = 'msg-row ' + (who==='user'? 'row-user':'row-bot');
-
+  row.className = 'msg-row';
+  
   const avatar = document.createElement('div');
-  avatar.className = 'avatar';
-  avatar.innerHTML = createAvatarSVG();
-
+  avatar.className = `avatar ${who === 'user' ? 'user' : ''}`;
+  avatar.innerHTML = createAvatarSVG(who === 'user');
+  
   const msg = document.createElement('div');
-  msg.className = 'msg ' + (who==='user'? 'user':'bot');
-  msg.innerHTML = text.replace(/\n/g,'<br>');
-
-  if(who==='user'){
+  msg.className = `msg ${who}`;
+  msg.innerHTML = text.replace(/\n/g, '<br>');
+  
+  // 添加时间戳
+  const time = new Date().toLocaleTimeString([], { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+  
+  if (who === 'user') {
     // 用户在右侧
     row.appendChild(msg);
     row.appendChild(avatar);
-  }else{
+  } else {
     row.appendChild(avatar);
     row.appendChild(msg);
   }
-
+  
   chat.appendChild(row);
-  if(meta){
-    const m = document.createElement('div'); m.className='meta'; m.textContent = meta; chat.appendChild(m);
+  
+  // 添加元信息
+  if (meta) {
+    const metaDiv = document.createElement('div');
+    metaDiv.className = 'meta';
+    metaDiv.textContent = `${meta} · ${time}`;
+    chat.appendChild(metaDiv);
   }
+  
+  // 滚动到底部
   chat.scrollTop = chat.scrollHeight;
+  
+  // 更新建议计数
+  if (who === 'bot') {
+    adviceCounter++;
+    adviceCount.textContent = adviceCounter;
+  }
 }
 
-// 显示 typing
-function addTyping(){
+// 显示正在输入动画
+function addTyping() {
   const row = document.createElement('div');
-  row.className='msg-row';
+  row.className = 'msg-row';
   row.id = 'typing-row';
-  const avatar = document.createElement('div'); avatar.className='avatar'; avatar.innerHTML = createAvatarSVG();
-  const typing = document.createElement('div'); typing.className='msg bot typing-wrapper'; typing.innerHTML = `<div class='typing'><span class='dot'></span><span class='dot'></span><span class='dot'></span></div>`;
-  row.appendChild(avatar); row.appendChild(typing);
+  
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.innerHTML = createAvatarSVG(false);
+  
+  const typing = document.createElement('div');
+  typing.className = 'msg bot typing-wrapper';
+  typing.innerHTML = `<div class='typing'>
+    <span class='dot'></span>
+    <span class='dot'></span>
+    <span class='dot'></span>
+  </div>`;
+  
+  row.appendChild(avatar);
+  row.appendChild(typing);
   chat.appendChild(row);
   chat.scrollTop = chat.scrollHeight;
 }
-function removeTyping(){ const t = document.getElementById('typing-row'); if(t) t.remove(); }
 
-// 键盘回车与按钮
-input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); sendMessage(); } });
+// 移除正在输入动画
+function removeTyping() {
+  const typingRow = document.getElementById('typing-row');
+  if (typingRow) {
+    typingRow.remove();
+  }
+}
+
+// 键盘事件监听
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// 发送按钮事件
 sendBtn.addEventListener('click', sendMessage);
 
-// chip 点击
-Array.from(document.querySelectorAll('.chip')).forEach(c=>{ c.addEventListener('click', ()=>{ input.value = c.textContent; sendMessage(); }); });
+// 芯片点击事件
+Array.from(document.querySelectorAll('.chip')).forEach(chip => {
+  chip.addEventListener('click', () => {
+    input.value = chip.querySelector('span').textContent;
+    input.focus();
+  });
+});
 
-// 发送主流程
+// 输入框图标功能
+document.getElementById('voiceBtn').addEventListener('click', function() {
+  alert('语音输入功能需要浏览器权限。在当前演示中，请直接输入您的问题。');
+});
+
+document.getElementById('attachBtn').addEventListener('click', function() {
+  alert('文件附加功能在演示中不可用。请直接输入您的问题。');
+});
+
+// 发送消息主流程
 let inFlight = false;
-async function sendMessage(){
+async function sendMessage() {
   const text = input.value.trim();
-  if(!text || inFlight) return;
+  if (!text || inFlight) return;
+  
   inFlight = true;
+  sendBtn.disabled = true;
+  
+  // 显示用户消息
   appendMessage(text, 'user');
   input.value = '';
-
+  
+  // 显示正在输入
   addTyping();
-
+  
+  // 模拟网络延迟
+  await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
+  
   // 尝试请求后端 API
-  try{
-    const resp = await fetch('/api/advice', {
-      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({message:text})
+  try {
+    const response = await fetch('/api/advice', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: text })
     });
-
-    if(!resp.ok) throw new Error('后端返回错误');
-    const data = await resp.json();
+    
+    if (!response.ok) throw new Error('后端服务不可用');
+    
+    const data = await response.json();
     removeTyping();
-    appendMessage(data.reply || '抱歉，未收到有效回答。', 'bot', '来自模型');
-  }catch(err){
+    appendMessage(
+      data.reply || '抱歉，我无法理解您的问题。请尝试重新表述。',
+      'bot',
+      'AI建议'
+    );
+    
+  } catch (error) {
     // 后端不可用 -> 使用前端规则引擎兜底
     removeTyping();
     const fallback = generateFallbackAdvice(text);
-    appendMessage(fallback, 'bot', '离线建议（本地规则）');
+    appendMessage(fallback, 'bot', '小贴士');
   }
-
+  
   inFlight = false;
+  sendBtn.disabled = false;
 }
 
-// 简单的前端规则建议（关键字匹配）
-function generateFallbackAdvice(text){
-  text = text.replace(/\s+/g,'');
-  const pairs = [
-    {k:["熬夜","凌晨"], v:"尽量将就寝时间提前到23:00前，建立睡前放松仪式（手机静音、温水洗脸、深呼吸）。若长期失眠建议就医并考虑认知行为疗法。"},
-    {k:["抽烟","香烟","烟瘾"], v:"建议逐步减少吸烟量并制定戒烟计划；可以寻求医生帮助或使用尼古丁替代疗法，增加体育活动以缓解戒断症状。"},
-    {k:["喝酒","酗酒"], v:"控制饮酒频率和量：男性每日不超过2个标准杯、女性不超过1个；避免空腹饮酒并注意心理疏导。"},
-    {k:["久坐","坐久","久站"], v:"每工作45-60分钟起身活动5-10分钟，做简单伸展或短步行；保持正确坐姿与腰背支撑。"},
-    {k:["失眠","睡不好"], v:"保持固定作息、减少晚间咖啡因摄入、睡前避免强光刺激；如长期严重建议就诊。"},
-    {k:["胃胀","消化不良","饭后不舒服"], v:"进食慢、少食多餐，避免过油腻和辛辣刺激；餐后适度散步帮助消化，必要时就医检查。"},
+// 前端规则建议引擎
+function generateFallbackAdvice(text) {
+  const lowerText = text.toLowerCase().replace(/\s+/g, '');
+  
+  const adviceMap = [
+    {
+      keywords: ['熬夜', '凌晨', '晚睡', '失眠', '睡不着', '睡眠'],
+      advice: '建议逐步调整作息时间：\n1. 每天提前15分钟睡觉，直到达到理想就寝时间（23:00前最佳）\n2. 睡前1小时避免使用电子设备，蓝光会抑制褪黑素分泌\n3. 建立睡前仪式：温水泡脚、阅读纸质书、听轻音乐\n4. 保持卧室黑暗、安静、凉爽（18-22℃）\n如果长期失眠，建议咨询医生或尝试认知行为疗法。'
+    },
+    {
+      keywords: ['抽烟', '吸烟', '香烟', '烟瘾', '戒烟'],
+      advice: '戒烟是改善健康的最佳决定之一：\n1. 设定明确戒烟日期，并告知亲友以获得支持\n2. 识别触发吸烟的情景，提前制定应对策略\n3. 可尝试尼古丁替代疗法（贴片、口香糖）\n4. 增加体育活动，缓解戒断症状和压力\n5. 记录戒烟节省的开支，用于奖励自己\n戒烟后20分钟心率下降，12小时一氧化碳水平恢复正常。'
+    },
+    {
+      keywords: ['久坐', '坐久', '腰酸', '背痛', '颈椎', '办公室'],
+      advice: '针对久坐问题的建议：\n1. 设置定时提醒，每45-60分钟起身活动5-10分钟\n2. 工作间隙做简单伸展：颈部旋转、肩部滚动、腰部扭转\n3. 调整桌椅高度：脚平放地面，大腿与地面平行，屏幕与眼睛平齐\n4. 考虑使用站立式办公桌，交替坐立\n5. 每天保证30分钟中等强度运动，如快走、游泳、瑜伽'
+    },
+    {
+      keywords: ['胃胀', '胃痛', '消化不良', '饭后', '肠胃', '腹泻', '便秘'],
+      advice: '肠胃健康建议：\n1. 细嚼慢咽，每口食物咀嚼20-30次\n2. 避免同时大量饮水和进食，减少胃液稀释\n3. 饭后不要立即躺下，可慢走10-15分钟助消化\n4. 记录饮食日记，识别引发不适的食物\n5. 增加膳食纤维摄入（蔬菜、水果、全谷物）\n6. 如症状持续或加重，建议就医进行专业检查'
+    },
+    {
+      keywords: ['压力', '焦虑', '紧张', '疲劳', '情绪', '抑郁'],
+      advice: '压力管理策略：\n1. 练习深呼吸：吸气4秒，屏气7秒，呼气8秒，重复5次\n2. 每天安排15-20分钟"自我时间"，做喜欢的事\n3. 保持规律运动，运动释放内啡肽改善情绪\n4. 建立支持系统，与亲友分享感受\n5. 尝试冥想或正念练习，专注当下\n如果情绪问题持续影响生活，请寻求专业心理咨询。'
+    },
+    {
+      keywords: ['饮食', '外卖', '不规律', '吃多', '减肥', '肥胖'],
+      advice: '饮食健康建议：\n1. 定时三餐，避免长时间空腹后暴饮暴食\n2. 增加蔬菜摄入，每餐至少占盘子一半\n3. 选择全谷物替代精制谷物\n4. 烹饪时减少油、盐、糖的使用量\n5. 外出就餐时选择蒸、煮、烤的菜肴\n6. 记录饮食，提高对摄入量的意识'
+    },
+    {
+      keywords: ['运动', '锻炼', '健身', '跑步', '减肥'],
+      advice: '运动建议：\n1. 每周至少150分钟中等强度有氧运动或75分钟高强度运动\n2. 加入力量训练，每周2次，锻炼主要肌群\n3. 选择喜欢的运动形式，增加坚持的可能性\n4. 从短时间开始，逐步增加持续时间和强度\n5. 运动前后做好热身和拉伸，防止受伤\n6. 寻找运动伙伴，增加乐趣和责任感'
+    }
   ];
-
-  for(const p of pairs){
-    for(const k of p.k){ if(text.indexOf(k) !== -1) return p.v; }
+  
+  // 查找匹配的建议
+  for (const item of adviceMap) {
+    for (const keyword of item.keywords) {
+      if (lowerText.includes(keyword)) {
+        return item.advice;
+      }
+    }
   }
-
+  
   // 通用建议
-  return "建议：规律作息、均衡饮食、每周至少150分钟中等强度运动（或75分钟高强度）、保持良好社交与心理状态。如症状严重或持续，请及时就医。";
+  return `感谢分享。针对您提到的情况，我建议：
+1. 保持规律作息，尽量在固定时间睡觉和起床
+2. 均衡饮食，多吃蔬菜水果和全谷物
+3. 每周保证至少150分钟中等强度运动
+4. 管理压力，通过冥想、深呼吸或爱好放松
+5. 定期体检，了解自身健康状况
+
+如果您有更具体的问题或症状，请详细描述，我可以提供更有针对性的建议。`;
 }
 
-// For demo: auto greet
-appendMessage('你好，我是养生小助手。你可以输入健康问题或不良生活习惯，我会给出建议。', 'bot', '示例');
-
-</script>
-</body>
-</html>
-
+// 健康小贴士点击事件
+document.querySelectorAll('.tip-item').forEach((tip, index) => {
+  tip.addEventListener('click', () => {
+    const tipText = tip.querySelector('.tip-text').textContent;
+    input.value = `关于"${tipText}"有什么建议？`;
+    input.focus();
+  });
+});
+ </script>
+ </body> 
+ </html>
