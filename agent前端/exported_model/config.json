@@ -1,0 +1,22 @@
+{
+    "vocab_size": 8000,
+    "max_input_len": 64,
+    "max_output_len": 128,
+    "d_model": 128,
+    "num_heads": 4,
+    "num_encoder_layers": 2,
+    "num_decoder_layers": 2,
+    "d_ff": 256,
+    "dropout_rate": 0.1,
+    "batch_size": 2,
+    "lr": 5e-05,
+    "epochs": 70,
+    "warmup_steps": 20,
+    "temperature": 0.9,
+    "clip_norm": 1.0,
+    "dtype": "int32",
+    "export_format": "CKPT",
+    "export_dir": "./exported_model",
+    "export_filename": "health_advice_transformer",
+    "data_path": "./health_data.txt"
+}
